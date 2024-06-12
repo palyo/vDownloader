@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryTransparent">#C0FFFFFF</color>
+    <color name="colorPrimaryLowTransparent">#E0FFFFFF</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
+
+    <color name="colorAccent">#000000</color>
+    <color name="colorSubAccent">#CA000000</color>
+    <color name="colorSubAccentTrans">#57000000</color>
+    <color name="colorAccentButtonText">#FFFFFF</color>
+
+    <color name="colorText">#252525</color>
+    <color name="colorSubText">#BC252525</color>
+
+    <color name="colorIcon">#252525</color>
+    <color name="colorIconOpacity">#BC424242</color>
+
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorBackgroundTransparent">#C7FFFFFF</color>
+    <color name="colorBackgroundSubTransparent">#57FFFFFF</color>
+
+    <color name="colorCard">#E2E2E2</color>
+    <color name="colorSubCard">#ECECEC</color>
+    <color name="colorLightCard">#EFEFEF</color>
+
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorWhiteTransparent">#D6FFFFFF</color>
+    <color name="colorWhiteSubTransparent">#57FFFFFF</color>
+    <color name="colorWhiteSubTrans">#1AFFFFFF</color>
+    <color name="colorWhiteHint">#A3FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorBlackTransparent">#D2000000</color>
+    <color name="colorBlackSubTransparent">#57000000</color>
+
+    <color name="colorTransparent">#00000000</color>
+
+    <color name="colorGreen">#007F05</color>
+    <color name="colorGreenTrans">#1F007F05</color>
+    <color name="colorRed">#F44336</color>
+    <color name="colorRedTrans">#1FF44336</color>
+</resources>
