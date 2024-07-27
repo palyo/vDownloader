@@ -13,15 +13,14 @@ import androidx.activity.*
 import androidx.appcompat.app.*
 import androidx.constraintlayout.widget.*
 import androidx.core.widget.*
-import androidx.lifecycle.*
 import com.bumptech.glide.*
 import com.bumptech.glide.load.resource.drawable.*
 import com.bumptech.glide.request.*
 import com.google.android.material.button.*
 import com.google.android.material.imageview.*
-import com.google.android.material.progressindicator.*
 import com.google.android.material.snackbar.*
 import com.google.android.material.textview.*
+import com.mugames.vidsnapkit.*
 import com.mugames.vidsnapkit.dataholders.*
 import com.mugames.vidsnapkit.extractor.*
 import com.video.downloader.R
@@ -375,74 +374,80 @@ class FragmentBrowserWindow : BaseFragment<FragmentBrowserWindowBinding>(Fragmen
 
                 extractor?.apply {
                     cookies = cookie
-                    start { result ->
-                        when (result) {
-                            is Result.Success -> {
-                                val format = result.formats.firstOrNull()
-                                val fileTitle = format?.title ?: ""
-                                val fileType: String
-                                val fileSize: Long
-                                val fileUrl: String
-                                val fileThumb: String
+                    startAsync(object : ProgressCallback {
+                        override fun onProgress(result: Result) {
+                            when (result) {
+                                is Result.Success -> {
+                                    val format = result.formats.firstOrNull()
+                                    val fileTitle = format?.title ?: ""
+                                    val fileType: String
+                                    val fileSize: Long
+                                    val fileUrl: String
+                                    val fileExt: String
+                                    val fileThumb: String
 
-                                if (format?.videoData?.isNotEmpty() == true) {
-                                    val videoData = format.videoData[0]
-                                    fileType = videoData.mimeType
-                                    fileSize = videoData.size
-                                    fileUrl = videoData.url
-                                    fileThumb = format.imageData.firstOrNull()?.url.orEmpty()
-                                } else if (format?.imageData?.isNotEmpty() == true) {
-                                    val imageData = format.imageData[0]
-                                    fileType = imageData.mimeType
-                                    fileSize = imageData.size
-                                    fileUrl = imageData.url
-                                    fileThumb = imageData.url
-                                } else {
-                                    fileType = ""
-                                    fileSize = 0L
-                                    fileUrl = ""
-                                    fileThumb = ""
-                                }
-
-                                context.runOnUiThread {
-                                    layoutProgress?.beGone()
-                                    layoutDownload?.beVisible()
-                                    if (imageThumb != null) {
-                                        Glide.with(context.applicationContext)
-                                            .load(fileThumb)
-                                            .transition(DrawableTransitionOptions.withCrossFade())
-                                            .apply(RequestOptions().dontTransform().dontAnimate().skipMemoryCache(false))
-                                            .into(imageThumb)
+                                    if (format?.videoData?.isNotEmpty() == true) {
+                                        val videoData = format.videoData[0]
+                                        fileType = videoData.mimeType
+                                        fileSize = videoData.size
+                                        fileUrl = videoData.url
+                                        fileThumb = format.imageData.firstOrNull()?.url.orEmpty()
+                                        fileExt = "mp4"
+                                    } else if (format?.imageData?.isNotEmpty() == true) {
+                                        val imageData = format.imageData[0]
+                                        fileType = imageData.mimeType
+                                        fileSize = imageData.size
+                                        fileUrl = imageData.url
+                                        fileThumb = imageData.url
+                                        fileExt = "jpeg"
+                                    } else {
+                                        fileType = ""
+                                        fileSize = 0L
+                                        fileUrl = ""
+                                        fileThumb = ""
+                                        fileExt = ""
                                     }
-                                    textMediaName?.text = fileTitle
-                                    textMediaDetails?.text = "${fileSize.bytesToHumanReadableSize()} \u2022 $fileType"
-                                    buttonClose?.setOnClickListener {
-                                        Handler(Looper.getMainLooper()).post {
+
+                                    context.runOnUiThread {
+                                        layoutProgress?.beGone()
+                                        layoutDownload?.beVisible()
+                                        if (imageThumb != null) {
+                                            Glide.with(context.applicationContext)
+                                                .load(fileThumb)
+                                                .transition(DrawableTransitionOptions.withCrossFade())
+                                                .apply(RequestOptions().dontTransform().dontAnimate().skipMemoryCache(false))
+                                                .into(imageThumb)
+                                        }
+                                        textMediaName?.text = fileTitle
+                                        textMediaDetails?.text = "${fileSize.bytesToHumanReadableSize()} \u2022 $fileType"
+                                        buttonClose?.setOnClickListener {
+                                            Handler(Looper.getMainLooper()).post {
+                                                dialog.dismiss()
+                                            }
+                                        }
+                                        buttonDownload?.setOnClickListener {
                                             dialog.dismiss()
+                                            val request = DownloadManager.Request(Uri.parse(fileUrl)).setAllowedNetworkTypes(
+                                                DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE
+                                            ).setAllowedOverRoaming(false).setNotificationVisibility(
+                                                DownloadManager.Request.VISIBILITY_VISIBLE or DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+                                            ).setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "${System.currentTimeMillis()}.$fileExt")
+                                            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                                            downloadManager.enqueue(request)
                                         }
                                     }
-                                    buttonDownload?.setOnClickListener {
-                                        dialog.dismiss()
-                                        val request = DownloadManager.Request(Uri.parse(fileUrl)).setAllowedNetworkTypes(
-                                            DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE
-                                        ).setAllowedOverRoaming(false).setNotificationVisibility(
-                                            DownloadManager.Request.VISIBILITY_VISIBLE or DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
-                                        ).setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "${System.currentTimeMillis()}.mp4")
-                                        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                                        downloadManager.enqueue(request)
-                                    }
                                 }
-                            }
-                            is Result.Failed -> {
+                                is Result.Failed -> {
                                     TAG.log("onClick: ${result.error}")
-                            }
-                            else -> {
-                                context.runOnUiThread {
-                                    TAG.log("onClick: $result")
+                                }
+                                else -> {
+                                    context.runOnUiThread {
+                                        TAG.log("onClick: $result")
+                                    }
                                 }
                             }
                         }
-                    }
+                    })
                 }
             }
         }
