@@ -8,6 +8,7 @@ import android.net.*
 import android.os.*
 import android.webkit.*
 import android.webkit.CookieManager
+import android.widget.*
 import androidx.activity.*
 import androidx.appcompat.app.*
 import androidx.constraintlayout.widget.*
@@ -242,7 +243,7 @@ class FragmentBrowserWindow : BaseFragment<FragmentBrowserWindowBinding>(Fragmen
                                 val js = assets.open("instagramScript.js").bufferedReader().use { it.readText() }
                                 evaluateJavascript(js, null)
                             } else if (pageUrl?.contains("instagram") == true) {
-                                val js = assets.open("official/instagram.js").bufferedReader().use { it.readText() }
+                                val js = assets.open("official/instagramTest.js").bufferedReader().use { it.readText() }
                                 evaluateJavascript(js, null)
                             } else {
                                 val js = assets.open("testScript.js").bufferedReader().use { it.readText() }
@@ -311,7 +312,11 @@ class FragmentBrowserWindow : BaseFragment<FragmentBrowserWindowBinding>(Fragmen
                 context.showDownloadDialog(url + "?__a=1", object : DownloadListener {
                     override fun onDownload(title: String, url: String) {
                         super.onDownload(title, url)
-                        val request = DownloadManager.Request(Uri.parse(url)).setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE).setAllowedOverRoaming(false).setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE or DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED).setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "$title")
+                        val request = DownloadManager.Request(Uri.parse(url)).setAllowedNetworkTypes(
+                            DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE
+                        ).setAllowedOverRoaming(false).setNotificationVisibility(
+                            DownloadManager.Request.VISIBILITY_VISIBLE or DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+                        ).setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "$title")
                         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                         downloadManager.enqueue(request)
                     }
@@ -337,121 +342,102 @@ class FragmentBrowserWindow : BaseFragment<FragmentBrowserWindowBinding>(Fragmen
         fun downloadInstagramVideo(url: String) {
             TAG.log("===> $url")
             val postUrl = url
-            context.apply {
-                lifecycleScope.launch {
-                    val cookie = CookieManager.getInstance().getCookie("https://www.instagram.com/")
-                    val dialog = context.showProgressDialog()
-                    val dialogTitle = dialog.findViewById<MaterialTextView>(R.id.dialog_title)
-                    val progressBar = dialog.findViewById<CircularProgressIndicator>(R.id.progress_bar)
-                    val layoutProgress = dialog.findViewById<ConstraintLayout>(R.id.layout_progress)
-                    val layoutDownload = dialog.findViewById<ConstraintLayout>(R.id.layout_download)
-                    val buttonDownload = dialog.findViewById<MaterialButton>(R.id.button_download)
-                    val buttonClose = dialog.findViewById<MaterialButton>(R.id.button_close)
-                    val imageThumb = dialog.findViewById<ShapeableImageView>(R.id.image_thumb)
-                    val textMediaName = dialog.findViewById<MaterialTextView>(R.id.text_media_name)
-                    val textMediaDetails = dialog.findViewById<MaterialTextView>(R.id.text_media_details)
-                    context.runOnUiThread {
-                        layoutProgress?.beVisible()
-                        layoutDownload?.beGone()
-                        progressBar?.isIndeterminate = true
-                        dialogTitle?.text = "Preparing.."
-                        if (!context.isFinishing || !context.isDestroyed) {
-                            dialog.show()
-                        }
+            val mainScope = CoroutineScope(Dispatchers.Main)
+
+            mainScope.launch {
+                val cookie = withContext(Dispatchers.IO) {
+                    CookieManager.getInstance().getCookie("https://www.instagram.com/")
+                }
+                val dialog = context.showProgressDialog()
+                val dialogTitle = dialog.findViewById<MaterialTextView>(R.id.dialog_title)
+                val progressBar = dialog.findViewById<ProgressBar>(R.id.progress_bar)
+                val layoutProgress = dialog.findViewById<ConstraintLayout>(R.id.layout_progress)
+                val layoutDownload = dialog.findViewById<ConstraintLayout>(R.id.layout_download)
+                val buttonDownload = dialog.findViewById<MaterialButton>(R.id.button_download)
+                val buttonClose = dialog.findViewById<MaterialButton>(R.id.button_close)
+                val imageThumb = dialog.findViewById<ShapeableImageView>(R.id.image_thumb)
+                val textMediaName = dialog.findViewById<MaterialTextView>(R.id.text_media_name)
+                val textMediaDetails = dialog.findViewById<MaterialTextView>(R.id.text_media_details)
+
+                context.runOnUiThread {
+                    layoutProgress?.beVisible()
+                    layoutDownload?.beGone()
+                    progressBar?.isIndeterminate = true
+                    dialogTitle?.text = "Preparing.."
+                    if (!context.isFinishing || !context.isDestroyed) {
+                        dialog.show()
                     }
-                    val extractor = Extractor.findExtractor(postUrl)
-                    extractor?.apply {
-                        cookies = cookie
-                        start { result ->
-                            when (result) {
-                                is Result.Success -> {
-                                    var fileTitle = ""
-                                    var fileType = ""
-                                    var fileSize = 0L
-                                    var fileUrl = ""
-                                    var fileThumb = ""
-                                    val formats = result.formats.toMutableList()
-                                    if (formats.isNotEmpty()) {
-                                        val format = formats[0]
-                                        fileTitle = format.title
-                                        if (format.videoData.isNotEmpty()) {
-                                            val videoData = format.videoData.get(0)
-                                            fileType = videoData.mimeType
-                                            fileSize = videoData.size
-                                            fileUrl = videoData.url
-                                            if (format.imageData.isNotEmpty()) {
-                                                val imageData = format.imageData.get(0)
-                                                fileThumb = imageData.url
-                                            }
-                                        } else if (format.imageData.isNotEmpty()) {
-                                            val imageData = format.imageData.get(0)
-                                            fileThumb = imageData.url
-                                            fileType = imageData.mimeType
-                                            fileSize = imageData.size
-                                            fileUrl = imageData.url
-                                        }
-                                    }
-                                    context.runOnUiThread {
-                                        layoutProgress?.beGone()
-                                        layoutDownload?.beVisible()
-                                        if (imageThumb != null) {
-                                            Glide.with(context.applicationContext).load(fileThumb).transition(DrawableTransitionOptions.withCrossFade()).apply(RequestOptions().dontTransform().dontAnimate().skipMemoryCache(false)).into(imageThumb)
+                }
 
-                                        }
-                                        textMediaName?.text = fileTitle
-                                        textMediaDetails?.text = "${fileSize.bytesToHumanReadableSize()} \u2022 $fileType"
-                                        buttonClose?.setOnClickListener {
-                                            Handler(Looper.getMainLooper()).post {
-                                                dialog.dismiss()
-                                            }
-                                        }
-                                        buttonDownload?.setOnClickListener {
+                val extractor = withContext(Dispatchers.IO) {
+                    Extractor.findExtractor(postUrl)
+                }
+
+                extractor?.apply {
+                    cookies = cookie
+                    start { result ->
+                        when (result) {
+                            is Result.Success -> {
+                                val format = result.formats.firstOrNull()
+                                val fileTitle = format?.title ?: ""
+                                val fileType: String
+                                val fileSize: Long
+                                val fileUrl: String
+                                val fileThumb: String
+
+                                if (format?.videoData?.isNotEmpty() == true) {
+                                    val videoData = format.videoData[0]
+                                    fileType = videoData.mimeType
+                                    fileSize = videoData.size
+                                    fileUrl = videoData.url
+                                    fileThumb = format.imageData.firstOrNull()?.url.orEmpty()
+                                } else if (format?.imageData?.isNotEmpty() == true) {
+                                    val imageData = format.imageData[0]
+                                    fileType = imageData.mimeType
+                                    fileSize = imageData.size
+                                    fileUrl = imageData.url
+                                    fileThumb = imageData.url
+                                } else {
+                                    fileType = ""
+                                    fileSize = 0L
+                                    fileUrl = ""
+                                    fileThumb = ""
+                                }
+
+                                context.runOnUiThread {
+                                    layoutProgress?.beGone()
+                                    layoutDownload?.beVisible()
+                                    if (imageThumb != null) {
+                                        Glide.with(context.applicationContext)
+                                            .load(fileThumb)
+                                            .transition(DrawableTransitionOptions.withCrossFade())
+                                            .apply(RequestOptions().dontTransform().dontAnimate().skipMemoryCache(false))
+                                            .into(imageThumb)
+                                    }
+                                    textMediaName?.text = fileTitle
+                                    textMediaDetails?.text = "${fileSize.bytesToHumanReadableSize()} \u2022 $fileType"
+                                    buttonClose?.setOnClickListener {
+                                        Handler(Looper.getMainLooper()).post {
                                             dialog.dismiss()
-                                            val request = DownloadManager.Request(Uri.parse(fileUrl)).setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE).setAllowedOverRoaming(false).setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE or DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED).setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "${System.currentTimeMillis()}.mp4")
-                                            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                                            downloadManager.enqueue(request)
                                         }
                                     }
+                                    buttonDownload?.setOnClickListener {
+                                        dialog.dismiss()
+                                        val request = DownloadManager.Request(Uri.parse(fileUrl)).setAllowedNetworkTypes(
+                                            DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE
+                                        ).setAllowedOverRoaming(false).setNotificationVisibility(
+                                            DownloadManager.Request.VISIBILITY_VISIBLE or DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+                                        ).setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "${System.currentTimeMillis()}.mp4")
+                                        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                                        downloadManager.enqueue(request)
+                                    }
                                 }
-
-                                is Result.Failed -> {
+                            }
+                            is Result.Failed -> {
                                     TAG.log("onClick: ${result.error}")
-                                    when (val error = result.error) {
-                                        is Error.LoginRequired -> {
-                                            TAG.log("LoginRequired: ${error.message}")
-                                        }
-
-                                        is Error.InternalError -> {
-                                            TAG.log("InternalError: ${error.message}")
-                                        }
-
-                                        is Error.NonFatalError -> {
-                                            TAG.log("NonFatalError: ${error.message}")
-                                        }
-
-                                        is Error.InvalidUrl -> {
-                                            TAG.log("InvalidUrl: ${error.message}")
-                                        }
-
-                                        is Error.InvalidCookies -> {
-                                            TAG.log("InvalidCookies: ${error.message}")
-                                        }
-
-                                        is Error.Instagram404Error -> {
-                                            TAG.log("Instagram404Error: ${error.isCookiesUsed}")
-                                        }
-
-                                        Error.MethodMissingLogic -> {
-                                            TAG.log("MethodMissingLogic: ${error.message}")
-                                        }
-                                    }
-                                }
-
-                                is Result.Progress -> {
-                                    TAG.log("onProgress: " + result.progressState)
-                                }
-
-                                else -> {
+                            }
+                            else -> {
+                                context.runOnUiThread {
                                     TAG.log("onClick: $result")
                                 }
                             }

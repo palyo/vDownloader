@@ -58,5 +58,5 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.jp.wasabeef.recyclerview.animators)
     implementation(libs.jp.wasabeef.glide.transformations)
-    implementation("io.github.udhayarajan:VidSnapKit:5.7.2")
+    implementation("io.github.udhayarajan:VidSnapKit:5.8.0")
 }
