@@ -1,125 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.circularreveal.CircularRevealRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorTransparent">
+    android:layout_marginBottom="1dp"
+    android:background="@drawable/ic_bg_rounded_sheet"
+    android:backgroundTint="@color/colorWhite"
+    android:clipToOutline="true"
+    android:paddingTop="@dimen/_12sdp">
 
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_12sdp"
-        android:layout_marginTop="@dimen/_12sdp"
-        android:layout_marginEnd="@dimen/_12sdp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/drag_handle"
+        android:layout_width="@dimen/_36sdp"
+        android:layout_height="@dimen/_4sdp"
         android:layout_marginBottom="@dimen/_12sdp"
-        app:cardBackgroundColor="@color/colorPrimary"
-        app:cardCornerRadius="@dimen/_24sdp"
-        app:cardElevation="0dp"
-        app:strokeWidth="0dp">
+        app:cardBackgroundColor="@color/colorCard"
+        app:cardElevation="@dimen/_0sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="@dimen/_0sdp" />
 
-        <com.google.android.material.circularreveal.CircularRevealLinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_title"
+        style="@style/TextBold"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:text="Download"
+        android:textSize="@dimen/_22sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/drag_handle" />
 
-            <com.google.android.material.circularreveal.CircularRevealLinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_download"
+        android:layout_width="@dimen/_0sdp"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_12sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_title">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_thumb"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_68sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="9:11"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/image_thumb"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_12sdp"
-                android:orientation="horizontal">
+                android:layout_height="match_parent"
+                app:cardCornerRadius="@dimen/_4sdp"
+                android:background="@color/colorLightCard"
+                android:scaleType="centerCrop" />
+        </androidx.cardview.widget.CardView>
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@color/colorLightCard"
-                    app:strokeWidth="0dp">
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_media_name"
+            style="@style/TextMedium"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:ellipsize="marquee"
+            android:gravity="start"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:maxLines="2"
+            android:singleLine="true"
+            android:text="Video name"
+            android:textSize="@dimen/_14sdp"
+            app:fontFamily="@font/medium"
+            app:layout_constraintStart_toEndOf="@+id/card_thumb"
+            app:layout_constraintTop_toTopOf="@+id/card_thumb" />
 
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/image_thumbnail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/_100sdp"
-                        android:adjustViewBounds="true"
-                        android:minWidth="@dimen/_56sdp" />
-                </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_media_size"
+            style="@style/TextRegular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.7"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="0KB"
+            android:textSize="@dimen/_10sdp"
+            app:layout_constraintStart_toStartOf="@+id/text_media_name"
+            app:layout_constraintTop_toBottomOf="@+id/text_media_name" />
 
-                <com.google.android.material.circularreveal.CircularRevealLinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:orientation="vertical">
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:includeFontPadding="false"
+            android:id="@+id/text_dot"
+            android:maxLines="1"
+            app:layout_constraintStart_toEndOf="@+id/text_media_size"
+            app:layout_constraintTop_toBottomOf="@+id/text_media_name"
+            app:layout_constraintBottom_toBottomOf="@+id/text_media_size"
+            android:text="\u2022"
+            android:textColor="@color/colorSubText"
+            android:textSize="@dimen/_10sdp"
+            app:fontFamily="@font/medium" />
 
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/text_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:includeFontPadding="false"
-                        android:maxLines="4"
-                        android:text="@string/app_name"
-                        android:textColor="@color/colorText"
-                        android:textSize="@dimen/_12sdp"
-                        app:fontFamily="@font/medium" />
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:id="@+id/text_media_duration"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            app:layout_constraintStart_toEndOf="@+id/text_dot"
+            app:layout_constraintTop_toTopOf="@+id/text_media_size"
+            app:layout_constraintBottom_toBottomOf="@+id/text_media_size"
+            android:text="00:00"
+            android:textColor="@color/colorSubText"
+            android:textSize="@dimen/_10sdp"
+            app:fontFamily="@font/medium" />
 
-                    <com.google.android.material.circularreveal.CircularRevealLinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_download"
+            style="@style/Theme.VidDownloader.MaterialButton"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginTop="@dimen/_6sdp"
+            android:text="Download"
+            android:textSize="@dimen/_12sdp"
+            app:layout_constraintEnd_toStartOf="@+id/button_close"
+            app:layout_constraintStart_toStartOf="@+id/text_media_name"
+            app:layout_constraintTop_toBottomOf="@+id/text_media_size" />
 
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/text_size"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/_8sdp"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:text=""
-                            android:textColor="@color/colorSubText"
-                            android:textSize="@dimen/_10sdp"
-                            app:fontFamily="@font/medium" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_close"
+            style="@style/Theme.VidDownloader.MaterialButton"
+            android:layout_width="@dimen/_0sdp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:text="Close"
+            android:textColor="@color/colorText"
+            android:textSize="@dimen/_12sdp"
+            app:backgroundTint="@color/colorLightCard"
+            app:layout_constraintBottom_toBottomOf="@+id/button_download"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/button_download"
+            app:layout_constraintTop_toTopOf="@+id/button_download" />
 
-                        <com.google.android.material.textview.MaterialTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/_8sdp"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:text="\u2022"
-                            android:textColor="@color/colorSubText"
-                            android:textSize="@dimen/_10sdp"
-                            app:fontFamily="@font/medium" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/text_duration"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/_8sdp"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:text=""
-                            android:textColor="@color/colorSubText"
-                            android:textSize="@dimen/_10sdp"
-                            app:fontFamily="@font/medium" />
-                    </com.google.android.material.circularreveal.CircularRevealLinearLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_download"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/_28sdp"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:layout_marginTop="@dimen/_8sdp"
-                        android:fontFamily="@font/bold"
-                        android:insetLeft="0dp"
-                        android:insetTop="0dp"
-                        android:insetRight="0dp"
-                        android:insetBottom="0dp"
-                        android:text="Download"
-                        android:textColor="@color/colorText"
-                        android:textSize="@dimen/_12sdp"
-                        app:backgroundTint="@color/colorLightCard" />
-                </com.google.android.material.circularreveal.CircularRevealLinearLayout>
-            </com.google.android.material.circularreveal.CircularRevealLinearLayout>
-
-        </com.google.android.material.circularreveal.CircularRevealLinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-</com.google.android.material.circularreveal.CircularRevealRelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

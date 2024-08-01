@@ -39,6 +39,8 @@ class FragmentBrowserWindow : BaseFragment<FragmentBrowserWindowBinding>(Fragmen
 
     private var doubleBackToExitPressedOnce = false
     private var pageUrl: String? = ""
+    private var lastUrl: String? = null
+    private val injectedUrls = mutableSetOf<String>()
 
     override fun create() {
         arguments?.let {
@@ -238,16 +240,22 @@ class FragmentBrowserWindow : BaseFragment<FragmentBrowserWindowBinding>(Fragmen
 
                         override fun onLoadResource(view: WebView?, url: String?) {
                             super.onLoadResource(view, url)
-                            if (pageUrl?.contains("facebook") == true) {
-                                val js = assets.open("instagramScript.js").bufferedReader().use { it.readText() }
-                                evaluateJavascript(js, null)
-                            } else if (pageUrl?.contains("instagram") == true) {
-                                val js = assets.open("official/instagramTest.js").bufferedReader().use { it.readText() }
-                                evaluateJavascript(js, null)
-                            } else {
-                                val js = assets.open("testScript.js").bufferedReader().use { it.readText() }
-                                evaluateJavascript(js, null)
-                            }
+                            if (url == null) return
+
+                                if (pageUrl?.contains("facebook") == true) {
+                                    val js = assets.open("facebookScript.js").bufferedReader().use { it.readText() }
+                                    evaluateJavascript(js, null)
+                                    injectedUrls.add(url)
+                                } else if (pageUrl?.contains("instagram") == true) {
+                                    val js = assets.open("official/instagramTest.js").bufferedReader().use { it.readText() }
+                                    evaluateJavascript(js, null)
+                                    injectedUrls.add(url)
+                                } else {
+                                    //val js = assets.open("testScript.js").bufferedReader().use { it.readText() }
+                                    //evaluateJavascript(js, null)
+                                    //injectedUrls.add(url)
+                                }
+                            //}
                         }
                     }
 
@@ -301,14 +309,10 @@ class FragmentBrowserWindow : BaseFragment<FragmentBrowserWindowBinding>(Fragmen
     class MyJavaScriptInterface(private val context: AppCompatActivity) {
 
         @JavascriptInterface
-        fun foundVideo(url: String, index: Int) {
-            TAG.log("foundVideo===> $url")
-        }
-
-        @JavascriptInterface
-        fun downloadVideo(url: String, index: Int) {
+        fun downloadFacebookVideo(url: String) {
+            TAG.log("Facebook===> $url")
             context.runOnUiThread {
-                context.showDownloadDialog(url + "?__a=1", object : DownloadListener {
+                context.showDownloadDialog(url, object : DownloadListener {
                     override fun onDownload(title: String, url: String) {
                         super.onDownload(title, url)
                         val request = DownloadManager.Request(Uri.parse(url)).setAllowedNetworkTypes(
@@ -323,11 +327,6 @@ class FragmentBrowserWindow : BaseFragment<FragmentBrowserWindowBinding>(Fragmen
             }
         }
 
-        @JavascriptInterface
-        fun shareVideoLink(url: String) {
-            TAG.log("===> $url")
-        }
-
         fun getCookie(name: String): String? {
             val cookies = CookieManager.getInstance().getCookie("https://www.instagram.com/")
             if (cookies == null || !cookies.contains("${name}=")) {
@@ -339,7 +338,7 @@ class FragmentBrowserWindow : BaseFragment<FragmentBrowserWindowBinding>(Fragmen
         @SuppressLint("SetTextI18n")
         @JavascriptInterface
         fun downloadInstagramVideo(url: String) {
-            TAG.log("===> $url")
+            TAG.log("Instagram===> $url")
             val postUrl = url
             val mainScope = CoroutineScope(Dispatchers.Main)
 
@@ -356,7 +355,7 @@ class FragmentBrowserWindow : BaseFragment<FragmentBrowserWindowBinding>(Fragmen
                 val buttonClose = dialog.findViewById<MaterialButton>(R.id.button_close)
                 val imageThumb = dialog.findViewById<ShapeableImageView>(R.id.image_thumb)
                 val textMediaName = dialog.findViewById<MaterialTextView>(R.id.text_media_name)
-                val textMediaDetails = dialog.findViewById<MaterialTextView>(R.id.text_media_details)
+                val textMediaDetails = dialog.findViewById<MaterialTextView>(R.id.text_media_size)
 
                 context.runOnUiThread {
                     layoutProgress?.beVisible()

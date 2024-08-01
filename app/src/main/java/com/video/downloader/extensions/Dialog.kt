@@ -23,24 +23,18 @@ interface DownloadListener {
 }
 
 fun Activity.showDownloadDialog(url: String, listener: DownloadListener?) {
-    val dialog = BottomSheetDialog(
-            this,
-            R.style.Theme_VidDownloader_BottomSheetDialogTheme
-    )
-    val bind: LayoutDialogVideoDownloadBinding =
-            LayoutDialogVideoDownloadBinding.inflate(layoutInflater)
+    val dialog = BottomSheetDialog(this, R.style.Theme_VidDownloader_BottomSheetDialogTheme)
+    val bind: LayoutDialogVideoDownloadBinding = LayoutDialogVideoDownloadBinding.inflate(layoutInflater)
     bind.apply {
         dialog.setContentView(root)
         val videoUri = Uri.parse(url)
         val videoName = videoUri.lastPathSegment
-        textTitle.text = videoName
+        textMediaName.text = videoName
         val retriever = MediaMetadataRetriever()
         try {
             retriever.setDataSource(url, HashMap())
-            val duration =
-                    retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()
-                            ?: 0L
-            textDuration.text = "${duration.getReadableDuration()}"
+            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
+            textMediaDuration.text = "${duration.getReadableDuration()}"
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
@@ -54,24 +48,23 @@ fun Activity.showDownloadDialog(url: String, listener: DownloadListener?) {
                 connection.requestMethod = "HEAD"
                 connection.connect()
                 size = connection.contentLength.toLong()
-                launch(Dispatchers.Main) { textSize.text = "${size.getReadableSize()}" }
+                launch(Dispatchers.Main) { textMediaSize.text = "${size.getReadableSize()}" }
                 connection.disconnect()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
         Glide.with(root.context)
-                .load(url)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .dontAnimate()
-                .into(imageThumbnail)
+            .load(url)
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .dontAnimate()
+            .into(imageThumb)
         buttonDownload.setOnClickListener {
             dialog.dismiss()
-            listener?.onDownload(title = textTitle.text.toString(), url = url)
+            listener?.onDownload(title = textMediaName.text.toString(), url = url)
         }
         (root.parent as View).backgroundTintMode = PorterDuff.Mode.CLEAR
-        (root.parent as View).backgroundTintList =
-                ColorStateList.valueOf(Color.TRANSPARENT)
+        (root.parent as View).backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
         (root.parent as View).setBackgroundColor(Color.TRANSPARENT)
     }
 
@@ -85,7 +78,7 @@ fun Activity.showDownloadDialog(url: String, listener: DownloadListener?) {
     dialog.setCanceledOnTouchOutside(true)
     dialog.window?.setDimAmount(.34f)
     dialog.window?.navigationBarColor =
-            ContextCompat.getColor(this@showDownloadDialog, R.color.colorBlack)
+        ContextCompat.getColor(this@showDownloadDialog, R.color.colorBlack)
     dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     if (!isFinishing || !isDestroyed)
         dialog.show()

@@ -106,7 +106,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/colorLightCard"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                app:cardCornerRadius="@dimen/_4sdp" />
         </androidx.cardview.widget.CardView>
 
         <com.google.android.material.textview.MaterialTextView
@@ -123,12 +124,11 @@
             android:text="Video name"
             android:textSize="@dimen/_14sdp"
             app:fontFamily="@font/medium"
-            app:layout_constraintStart_toEndOf="@id/card_thumb"
-            app:layout_constraintTop_toTopOf="@id/card_thumb"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintStart_toEndOf="@+id/card_thumb"
+            app:layout_constraintTop_toTopOf="@+id/card_thumb" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/text_media_details"
+            android:id="@+id/text_media_size"
             style="@style/TextRegular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -137,7 +137,7 @@
             android:maxLines="1"
             android:text="0KB"
             android:textSize="@dimen/_10sdp"
-            app:layout_constraintStart_toStartOf="@id/text_media_name"
+            app:layout_constraintStart_toStartOf="@+id/text_media_name"
             app:layout_constraintTop_toBottomOf="@+id/text_media_name" />
 
         <com.google.android.material.button.MaterialButton
@@ -148,9 +148,9 @@
             android:layout_marginTop="@dimen/_6sdp"
             android:text="Download"
             android:textSize="@dimen/_12sdp"
-            app:layout_constraintEnd_toStartOf="@id/button_close"
-            app:layout_constraintStart_toStartOf="@id/text_media_name"
-            app:layout_constraintTop_toBottomOf="@+id/text_media_details" />
+            app:layout_constraintEnd_toStartOf="@+id/button_close"
+            app:layout_constraintStart_toStartOf="@+id/text_media_name"
+            app:layout_constraintTop_toBottomOf="@+id/text_media_size" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_close"
@@ -162,10 +162,10 @@
             android:textColor="@color/colorText"
             android:textSize="@dimen/_12sdp"
             app:backgroundTint="@color/colorLightCard"
-            app:layout_constraintBottom_toBottomOf="@id/button_download"
+            app:layout_constraintBottom_toBottomOf="@+id/button_download"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/button_download"
-            app:layout_constraintTop_toTopOf="@id/button_download" />
+            app:layout_constraintStart_toEndOf="@+id/button_download"
+            app:layout_constraintTop_toTopOf="@+id/button_download" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
